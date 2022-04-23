@@ -1,9 +1,8 @@
 import * as React from 'react';
-import {Button, Flex, useColorModeValue, useToast} from '@chakra-ui/react';
+import {Button, Divider, Flex, Heading, useColorModeValue, useToast} from '@chakra-ui/react';
 import { EmailField } from '../components/inputs/Email';
 import { PasswordField } from '../components/inputs/Password';
-import { AuthenticationApi, Configuration, RegisterRequestModel, TokenModel } from '../axiosClient';
-import axios from 'axios';
+import { AccessTokenDto, Invite, RegisterDto, TokenDto } from '../client';
 import { useHistory, useParams } from 'react-router-dom';
 import { useStores } from '../stores';
 import { NameField } from '../components/inputs/Name';
@@ -13,8 +12,8 @@ export const RegisterForm = () => {
   const history = useHistory();
   const toast = useToast()
   const {appStore} = useStores();
-  let {token} = useParams<TokenModel>();
-  const [state, setState] = React.useState<RegisterRequestModel>({
+  let {token} = useParams<{token:string}>();
+  const [state, setState] = React.useState<RegisterDto>({
     firstName: '',
     lastName: '',
     email: '',
@@ -25,11 +24,14 @@ export const RegisterForm = () => {
   const {authApi} = useApi();
   const login = () => {
     setLoading(true);
-    authApi.authRegisterTokenPost(token, state).then(response => {
-      if(response.status === 201 && response.data.token) {
-        appStore.login(response.data.token);
-        setLoading(false);
-        history.push("/");
+    authApi.authRegister(token, {...state, tokenDescription: 'Web ui'}).then(response => {
+          
+      if(response.status === 201 && response.data.data) {
+        authApi.authClaim({ access: (response.data.data as AccessTokenDto).access }).then(resp => {
+          appStore.login(resp.data.data as TokenDto);
+          setLoading(false);
+          history.push("/");
+        })
       } else {
         setLoading(false);
         toast({
@@ -53,17 +55,19 @@ export const RegisterForm = () => {
     });
   };
   React.useEffect(() => {
-    authApi.authRegisterTokenGet(token).then(response => {
+    authApi.authRegisterProbe(token).then(response => {
       if (response.status === 200) {
         setState({
           ...state,
-          email: response.data.email || '',
+          email: (response.data.data as Invite).email || '',
         })
       }
     });
   }, []);
   return (
     <Flex p={8} direction="column" rounded={10} bgColor={bg}>
+      <Heading alignSelf="center" className="registerHeading">Register</Heading>
+      <Divider mb={4} mt={2} />
       <NameField value={state.firstName} setValue={(firstName) => setState({...state, firstName})} label='First name' id='firstName' placeholder='Jane' />
       <NameField value={state.lastName} setValue={(lastName) => setState({...state, lastName})} label='Last name' id='lastName' placeholder='Doe'/>
       <EmailField value={state.email} setValue={(email) => setState({...state, email})} />

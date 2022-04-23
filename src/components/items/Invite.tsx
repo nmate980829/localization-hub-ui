@@ -14,12 +14,13 @@ import { useStores } from '../../stores';
 import { useObserver } from 'mobx-react';
 import { FaRegPaperPlane } from 'react-icons/fa';
 import { InviteRoleEnum, UserResponseRoleEnum } from '../../axiosClient';
+import { SERVERROLE } from '../../client';
 
 const MotionBox = motion(Box);
 const MotionCircle = motion(Circle);
 dayjs.extend(LocalizedFormat);
 
-export const InviteItem: React.FC<InviteProps> = ({ invite, remove, resend }) => {
+export const InviteItem: React.FC<InviteProps> = ({ item, remove, resend }) => {
   const bg = useColorModeValue('gray.300', 'gray.500');
   const from = useColorModeValue('gray.400', 'teal.700');
   const {appStore} = useStores();
@@ -68,14 +69,13 @@ export const InviteItem: React.FC<InviteProps> = ({ invite, remove, resend }) =>
             my={2}
           >
             <Avatar bg="teal.600" />
-            {appStore.user?.id === invite.initiatorId &&
+            {appStore.user?.id === item.initiatorId &&
               <Badge variant="solid" colorScheme="teal" mx={2} fontSize="lg" rounded={10} p={1} px={6} >MINE</Badge>
             }
-            {dayjs().isAfter(invite.expiration) &&
+            {dayjs().isAfter(item.expiration) &&
               <Badge variant="solid" colorScheme="red" mx={2} fontSize="lg" rounded={10} p={1} px={6} >EXPIRED</Badge>
             }
-            <Text mx={3}>{invite.email}</Text>
-            <Text mx={3}>{invite.initiator?.firstName}</Text>
+            <Text mx={3}>{item.email}</Text>
           </Flex>
           <Flex
             direction="row"
@@ -83,17 +83,17 @@ export const InviteItem: React.FC<InviteProps> = ({ invite, remove, resend }) =>
             mx={0}
             my={2}
           >
-            <Tooltip label={dayjs(invite.expiration).format('LLLL')} aria-label="Exact date and time">
+            <Tooltip label={dayjs(item.expiration).format('LLLL')} aria-label="Exact date and time">
               <Text mx={3}>
-                Expires: {dayjs(invite.expiration).format('YYYY. MM. DD. - HH:mm')}
+                Expires: {dayjs(item.expiration).format('YYYY. MM. DD. - HH:mm')}
               </Text>
             </Tooltip>
-            <Tooltip label={dayjs(invite.createdAt).format('LLLL')} aria-label="Exact date and time">
+            <Tooltip label={dayjs(item.createdAt).format('LLLL')} aria-label="Exact date and time">
               <Text mx={3}>
-                Created: {dayjs(invite.createdAt).format('YYYY. MM. DD. - HH:mm')}
+                Created: {dayjs(item.createdAt).format('YYYY. MM. DD. - HH:mm')}
               </Text>
             </Tooltip>
-            <Badge variant="solid" colorScheme="teal" mx={10} fontSize="lg" rounded={10} p={1} px={6} >{invite.role}</Badge>
+            <Badge variant="solid" colorScheme="teal" mx={10} fontSize="lg" rounded={10} p={1} px={6} >{item.role}</Badge>
             <Tooltip label="Resend invitation" aria-label="Resend invitation">
               <MotionCircle bgColor="teal.500" p={4} mr={2} whileHover={{ scale: 1.15 }} onClick={resend} whileTap={{scale: 1.3}}>
                 <Icon as={FaRegPaperPlane} />
@@ -101,12 +101,12 @@ export const InviteItem: React.FC<InviteProps> = ({ invite, remove, resend }) =>
                 }
               </MotionCircle>
             </Tooltip>
-            <Tooltip label={(invite.role === InviteRoleEnum.Admin && appStore.role !== UserResponseRoleEnum.Admin) ? 'You cannot delete an admin invite': ''} >
+            <Tooltip label={(item.role === SERVERROLE.Admin && appStore.role !== SERVERROLE.Admin) ? 'You cannot delete an admin invite': ''} >
               <MotionCircle
-                bgColor={(invite.role === InviteRoleEnum.Admin && appStore.role !== UserResponseRoleEnum.Admin) ? 'gray.400' : 'red.500'}
+                bgColor={(item.role === SERVERROLE.Admin && appStore.role !== SERVERROLE.Admin) ? 'gray.400' : 'red.500'}
                 p={4}
                 whileHover={{ scale: 1.15 }}
-                onClick={(invite.role === InviteRoleEnum.Admin && appStore.role !== UserResponseRoleEnum.Admin) ? disabledAlert : remove}
+                onClick={(item.role === SERVERROLE.Admin && appStore.role !== SERVERROLE.Admin) ? disabledAlert : remove}
                 whileTap={{scale: 1.3}}
                 >
                 <DeleteIcon />

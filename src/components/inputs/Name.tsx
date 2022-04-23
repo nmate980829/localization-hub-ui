@@ -3,7 +3,7 @@ import {FormControl, FormHelperText, FormLabel, Input, InputGroup, InputLeftElem
 import {EmailIcon} from '@chakra-ui/icons'
 import { InputProps, NameProps } from './types';
 
-export const NameField: React.FC<InputProps & NameProps> = ({value, setValue, label, id, placeholder}) => {
+export const NameField = React.forwardRef<HTMLInputElement, InputProps & NameProps>(({value, setValue, label, id, placeholder, className}, ref) => {
   const placeholderColor = useColorModeValue('gray.500', 'gray.400');
   return (
     <FormControl id={id} pb={4}>
@@ -14,8 +14,10 @@ export const NameField: React.FC<InputProps & NameProps> = ({value, setValue, la
           _placeholder={{color: placeholderColor}}
           value={value}
           onChange={event => setValue(event.target.value)}
+          ref={ref}
+          className={className}
           />
       </InputGroup>
     </FormControl>
   );
-}
+});

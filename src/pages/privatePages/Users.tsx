@@ -5,7 +5,7 @@ import {
 import { PageHeader } from '../../components/PageHeader';
 import { SearchInput } from '../../components/inputs/Search';
 import { useApi } from '../../hooks/useApi';
-import { Invite, User, UserResponse, UserResponseRoleEnum as Role } from '../../axiosClient';
+import { UserResponse, SERVERROLE as Role } from '../../client';
 import { InviteItem } from '../../components/items/Invite';
 import { Confirm } from '../../components/Confirm';
 import { AnimatePresence } from 'framer-motion';
@@ -15,7 +15,6 @@ import { useRole } from '../../hooks/useRole';
 import { useStores } from '../../stores';
 
 export const UsersPage = () => {
-  useRole(Role.Hr);
   const [search, setSearch] = React.useState<string>('');
   const [users, setUsers] = React.useState<UserResponse[] | undefined>(undefined);
   const [shouldRefresh, setRefresh] = React.useState<number>(0);
@@ -33,8 +32,8 @@ export const UsersPage = () => {
   const toast = useToast();
 
   const {userApi} = useApi();
-  const removeItem = () => userApi.usersIdDelete(selected?.id!!).then((response) => {
-    if (response.status === 204) {
+  const removeItem = () => userApi.usersRemove(selected?.id!!).then((response) => {
+    if (response.status === 200) {
       setDialog(0)
       setSelected(undefined);
       refresh();
@@ -50,9 +49,9 @@ export const UsersPage = () => {
 
   React.useEffect(() => {
     appStore.refresh();
-    userApi.usersGet().then(response => {
-      if (response.status === 200 && response.data.result) {
-        setUsers(response.data.result);
+    userApi.usersFindAll().then(response => {
+      if (response.status === 200 && response.data.data) {
+        setUsers(response.data.data as UserResponse[]);
         setTimeout(appStore.refreshed, 1000);
       }
     }).catch(err => {
@@ -69,7 +68,7 @@ export const UsersPage = () => {
 
   const userList = users?.filter(user => user.email?.includes(search) || user.firstName?.includes(search) || user.lastName?.includes(search))
     .map((user) => (
-      <UserItem user={user} remove={() => remove(user)} key={user.id} />
+      <UserItem item={user} remove={() => remove(user)} key={user.id} />
     )) || [];
 
   return (

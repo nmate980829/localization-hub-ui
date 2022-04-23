@@ -5,7 +5,7 @@ import {
 import { PageHeader } from '../../components/PageHeader';
 import { SearchInput } from '../../components/inputs/Search';
 import { useApi } from '../../hooks/useApi';
-import { Invite, UserResponseRoleEnum as Role } from '../../axiosClient';
+import { Invite, SERVERROLE as Role } from '../../client';
 import { InviteItem } from '../../components/items/Invite';
 import { Confirm } from '../../components/Confirm';
 import { AnimatePresence } from 'framer-motion';
@@ -35,8 +35,8 @@ export const InvitesPage = () => {
   const toast = useToast();
 
   const {inviteApi} = useApi();
-  const removeItem = () => inviteApi.invitesIdDelete(selected?.id!!).then((response) => {
-    if (response.status === 204) {
+  const removeItem = () => inviteApi.invitationsRemove(selected?.id!!).then((response) => {
+    if (response.status === 200) {
       setDialog(0)
       setSelected(undefined);
       refresh();
@@ -49,7 +49,7 @@ export const InvitesPage = () => {
       });
     }
   });
-  const resendItem = () => inviteApi.invitesIdResendPut(selected?.id!!).then((response) => {
+  const resendItem = () => inviteApi.invitationsResend(selected?.id!!).then((response) => {
     if (response.status === 200) {
       setDialog(0)
       setSelected(undefined);
@@ -66,12 +66,14 @@ export const InvitesPage = () => {
 
   React.useEffect(() => {
     appStore.refresh();
-    inviteApi.invitesGet().then(response => {
-      if (response.status === 200 && response.data.result) {
-        setInvites(response.data.result);
+    inviteApi.invitationsFindAll().then(response => {
+      console.log(response)
+      if (response.status === 200 && response.data.data) {
+        setInvites(response.data.data as Invite[]);
         setTimeout(appStore.refreshed, 1000);
       }
     }).catch(err => {
+      console.log(err)
       toast({
         title: 'Items cannot be loaded',
         description: 'Try to refresh',
@@ -85,7 +87,7 @@ export const InvitesPage = () => {
 
   const inviteList = invites?.filter(invite => invite.email?.includes(search))
     .map((invite) => (
-      <InviteItem invite={invite} remove={() => remove(invite)} key={invite.id} resend={() => resend(invite)} />
+      <InviteItem item={invite} remove={() => remove(invite)} key={invite.id} resend={() => resend(invite)} />
     )) || [];
 
   return (

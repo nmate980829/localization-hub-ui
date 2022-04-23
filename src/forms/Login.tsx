@@ -1,11 +1,13 @@
 import * as React from 'react';
-import {Button, Flex, useColorModeValue, useToast} from '@chakra-ui/react';
+import {Button, Divider, Flex, Heading, useColorModeValue, useToast} from '@chakra-ui/react';
 import { EmailField } from '../components/inputs/Email';
 import { PasswordField } from '../components/inputs/Password';
-import { AuthenticationApi, Configuration } from '../axiosClient';
+import { AccessTokenDto, AuthenticationApi, Configuration, TokenDto, UserResponse, UsersApi } from '../client';
 import axios from 'axios';
 import { useHistory } from 'react-router-dom';
 import { useStores } from '../stores';
+import { useApi } from '../hooks/useApi';
+import { useAlert } from '../hooks/useAlert';
 
 export const LoginForm = () => {
   const history = useHistory();
@@ -16,41 +18,33 @@ export const LoginForm = () => {
   const [password, setPassword] = React.useState<string>('');
   const [loading, setLoading] = React.useState<boolean>(false);
   const bg = useColorModeValue('gray.300', 'gray.500');
-  const userApi = new AuthenticationApi(new Configuration({}), 'http://localhost:8080/api', axios);
-  const login = () => {
+  const {authApi} = useApi();
+  const {error} = useAlert();
+  const login = async () => {
     setLoading(true);
-    userApi.authLoginPost({email, password}).then(response => {
-      if(response.status === 200 && response.data.token) {
-        appStore.login(response.data.token);
-        setLoading(false);
-        history.push("/");
-      } else {
-        setLoading(false);
-        toast({
-          title: "Login failed.",
-          description: "fail",
-          status: "error",
-          duration: 9000,
-          isClosable: true,
-        });
-      }
-    }).catch(error => {
+    try {
+      const access = await authApi.authLogin({email, password, tokenDescription: 'Web ui'});
+      const tokenRes = await authApi.authClaim({ access: (access.data.data as AccessTokenDto).access });
+      const token = tokenRes.data.data as TokenDto;
+      appStore.login(token);
+      const userApi = new UsersApi(new Configuration({ accessToken: token.token }), token.server);
+      const user = await userApi.usersGetMe({});
+      appStore.syncMe(user.data.data as UserResponse);
       setLoading(false);
-      console.log(error);
-      toast({
-        title: "Error during request.",
-        description: "Network error",
-        status: "error",
-        duration: 9000,
-        isClosable: true,
-      });
-    });
+      history.push("/"); 
+    } catch (err) {
+      setLoading(false);
+      error('Error during logging in.')
+    }
+      
   };
   return (
     <Flex p={8} direction="column" rounded={10} bgColor={bg}>
+      <Heading alignSelf="center" className="loginHeading">Login</Heading>
+      <Divider mb={4} mt={2} />
       <EmailField value={email} setValue={setEmail} />
       <PasswordField value={password} setValue={setPassword} />
-      <Button mt={4} colorScheme="gray" isLoading={loading} onClick={login}>Login</Button>
+      <Button mt={4} colorScheme="gray" isLoading={loading} onClick={login} className="submitButton" >Login</Button>
     </Flex>
   );
 }

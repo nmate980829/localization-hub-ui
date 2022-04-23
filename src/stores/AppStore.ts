@@ -1,10 +1,10 @@
 import {observable, action, makeObservable, computed} from 'mobx';
 import { ignore } from 'mobx-sync';
-import { UserResponse as User, UserResponseRoleEnum as Role } from '../axiosClient';
+import { SERVERROLE, TokenDto, UserResponse as User } from '../client';
 
 export class AppStore {
   @observable
-  token?: string;
+  token?: TokenDto;
   @observable
   user?: User;
   @observable
@@ -18,11 +18,11 @@ export class AppStore {
     return this.token !== undefined;
   }
   @computed
-  public get role(): Role | undefined {
+  public get role(): SERVERROLE | undefined {
     return this.user?.role;
   }
   @action.bound
-  login(token: string) {
+  login(token: TokenDto) {
     this.token = token;
   }
   @action.bound

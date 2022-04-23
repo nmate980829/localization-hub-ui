@@ -1,6 +1,6 @@
 import { useObserver } from 'mobx-react';
 import { useHistory } from 'react-router-dom';
-import { UserResponseRoleEnum as Role } from '../axiosClient';
+import { SERVERROLE as Role } from '../client';
 import { useStores } from '../stores';
 
 export const useRole = (role?: Role) => {

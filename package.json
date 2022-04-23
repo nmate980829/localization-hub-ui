@@ -22,6 +22,7 @@
     "mobx": "^6.3.6",
     "mobx-react": "^7.2.1",
     "mobx-sync": "^3.0.0",
+    "puppeteer": "^13.5.2",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-icons": "^3.0.0",
@@ -35,7 +36,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "generate": "npx openapi-generator-cli generate -g typescript-axios -o src/axiosClient -i http://localhost:8080/api-spec"
+    "generate": "npx openapi-generator-cli generate -g typescript-axios -o src/client -i http://localhost:3000/openapi-json"
   },
   "eslintConfig": {
     "extends": "react-app"

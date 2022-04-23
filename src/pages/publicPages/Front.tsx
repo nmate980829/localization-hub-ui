@@ -4,6 +4,8 @@ import {
   VStack,
   Grid,
   Button,
+  Heading,
+  Text,
 } from "@chakra-ui/react";
 import { Logo } from '../../Logo';
 import { Link } from 'react-router-dom';
@@ -13,16 +15,12 @@ import { useStores } from '../../stores';
 export const FrontPage = () => {
   const {appStore} = useStores();
   return (
-    <Box textAlign="center" w="100%" fontSize="xl">
-      <Grid minH="100%" minW="100%" p={10}>
-        <VStack spacing={8}>
-          <Logo h="40vmin" pointerEvents="none" />
-        </VStack>
-        <Loader />
-        <Link to="/login">
-          <Button colorScheme="teal" onClick={appStore.load}>Login</Button>
-        </Link>
-      </Grid>
-    </Box>
+    <VStack spacing={8} textAlign="center" justify="center" w="100%" h="100%" fontSize="xl">
+      <Heading className="welcomeText" >Welcome to Locahub!</Heading>
+      <Text>This is the {process.env.REACT_APP_NAME} Localization project</Text>
+      <Link to="/projects">
+        <Button>Check out the projects!</Button>
+      </Link>
+    </VStack>
   );
 }

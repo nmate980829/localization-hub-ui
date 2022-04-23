@@ -12,6 +12,7 @@ import { useApi } from '../../hooks/useApi';
 import { LoaderOverlay } from '../LoaderOverlay';
 import { MotionCircle } from '../Motion';
 import { AnimatePresence } from 'framer-motion';
+import { UserResponse } from '../../client';
 
 export const MainLayout: React.FC<LayoutProps> = ({children}) => {
   const headerBg = useColorModeValue('gray.400', 'gray.600');
@@ -20,8 +21,8 @@ export const MainLayout: React.FC<LayoutProps> = ({children}) => {
   React.useEffect(() => {
     const interval = setInterval(() => {
         console.log('[sync user]', new Date());
-        userApi.usersMeGet().then(response => {
-          appStore.syncMe(response.data);
+        userApi.usersGetMe().then(response => {
+          appStore.syncMe(response.data.data as UserResponse);
         });
       }, 20000);
     return () => clearInterval(interval);

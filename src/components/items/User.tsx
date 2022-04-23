@@ -13,12 +13,13 @@ import LocalizedFormat from 'dayjs/plugin/localizedFormat';
 import { UserResponseRoleEnum, UserRoleEnum } from '../../axiosClient';
 import { useStores } from '../../stores';
 import { useObserver } from 'mobx-react';
+import { SERVERROLE } from '../../client';
 
 const MotionBox = motion(Box);
 const MotionCircle = motion(Circle);
 dayjs.extend(LocalizedFormat);
 
-export const UserItem: React.FC<UserProps> = ({ user, remove }) => {
+export const UserItem: React.FC<UserProps> = ({ item, remove }) => {
   const bg = useColorModeValue('gray.300', 'gray.500');
   const from = useColorModeValue('gray.400', 'teal.700');
   const {appStore} = useStores();
@@ -69,9 +70,9 @@ export const UserItem: React.FC<UserProps> = ({ user, remove }) => {
               my={2}
             >
               <Avatar bg="teal.600" />
-              <Text mx={3}>{user.firstName} {user.lastName}</Text>
-              <LinkOverlay to={`/users/${user.id}`} as={Link}>
-                <Text mx={3}>{user.email}</Text>
+              <Text mx={3}>{item.firstName} {item.lastName}</Text>
+              <LinkOverlay to={`/users/${item.id}`} as={Link}>
+                <Text mx={3}>{item.email}</Text>
               </LinkOverlay>
             </Flex>
             <Flex
@@ -80,17 +81,17 @@ export const UserItem: React.FC<UserProps> = ({ user, remove }) => {
               mx={0}
               my={2}
             >
-              <Badge variant="solid" colorScheme="teal" mx={10} fontSize="lg" rounded={10} p={1} px={6} >{user.role}</Badge>
+              <Badge variant="solid" colorScheme="teal" mx={10} fontSize="lg" rounded={10} p={1} px={6} >{item.role}</Badge>
               <Tooltip
-                label={(user.id === appStore.user?.id || 
-                  (user.role === UserResponseRoleEnum.Admin
-                    && appStore.role !== UserResponseRoleEnum.Admin))
-                    ? `You can't ${user.disabled ? 'enable' : 'disable'} ${user.id === appStore.user?.id ? 'yourself' : 'admins'}`
-                    : `${user.disabled ? 'Enable' : 'Disable'} user`
+                label={(item.id === appStore.user?.id || 
+                  (item.role === SERVERROLE.Admin
+                    && appStore.role !== SERVERROLE.Admin))
+                    ? `You can't ${item.disabled ? 'enable' : 'disable'} ${item.id === appStore.user?.id ? 'yourself' : 'admins'}`
+                    : `${item.disabled ? 'Enable' : 'Disable'} user`
                 }
-                aria-label={`${user.disabled ? 'Enable' : 'Disable'} User`}>
+                aria-label={`${item.disabled ? 'Enable' : 'Disable'} User`}>
                 <MotionCircle
-                  bgColor={(user.id === appStore.user?.id || (user.role === UserResponseRoleEnum.Admin && appStore.role !== UserResponseRoleEnum.Admin)) ? 'gray.400' : 'teal.500'}
+                  bgColor={(item.id === appStore.user?.id || (item.role === SERVERROLE.Admin && appStore.role !== SERVERROLE.Admin)) ? 'gray.400' : 'teal.500'}
                   p={4}
                   mr={2}
                   zIndex={10}
@@ -98,13 +99,13 @@ export const UserItem: React.FC<UserProps> = ({ user, remove }) => {
                   whileTap={{scale:1.3}}
                   onClick={disabledAlert}
                   >
-                  {user.disabled ? <UnlockIcon /> : <LockIcon />}
+                  {item.disabled ? <UnlockIcon /> : <LockIcon />}
                 </MotionCircle>
               </Tooltip>
               
-              {(user.id === appStore.user?.id || (user.role === UserResponseRoleEnum.Admin && appStore.role !== UserResponseRoleEnum.Admin)) ?
-                <Tooltip label={`You can't delete ${ user.id === appStore.user?.id ? 'yourself' : 'admins'}`}
-                  aria-label={user.id === appStore.user?.id ? 'You can\'t delete your own account':'Only admins can delete admins'}>
+              {(item.id === appStore.user?.id || (item.role === SERVERROLE.Admin && appStore.role !== SERVERROLE.Admin)) ?
+                <Tooltip label={`You can't delete ${ item.id === appStore.user?.id ? 'yourself' : 'admins'}`}
+                  aria-label={item.id === appStore.user?.id ? 'You can\'t delete your own account':'Only admins can delete admins'}>
                   <MotionCircle
                     bgColor="gray.400"
                     p={4}

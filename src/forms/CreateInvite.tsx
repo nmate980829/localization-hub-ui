@@ -8,30 +8,32 @@ import { useApi } from '../hooks/useApi';
 import { useStores } from '../stores';
 import { useObserver } from 'mobx-react';
 import dayjs from 'dayjs';
+import { InvitationResponse, SERVERROLE } from '../client';
 
 export const CreateInvite: React.FC<Props> = ({isOpen, onClose, refresh}) => {
   const firstField = React.useRef(null);
   const {appStore} = useStores();
   const [email, setEmail] = React.useState<string>('');
-  const [role, setRole] = React.useState<UserRoleEnum>(UserRoleEnum.User);
+  const [role, setRole] = React.useState<SERVERROLE>(SERVERROLE.User);
   const close = () => {
     onClose();
     setEmail('');
-    setRole(UserRoleEnum.User);
+    setRole(SERVERROLE.User);
   }
   const {inviteApi} = useApi();
   const toast = useToast();
   const submit = () => {
-    inviteApi.invitesPost({email, role}).then(response => {
+    inviteApi.invitationsCreate({email, role}).then(response => {
       if(response.status === 201) {
+        const res = response.data.data as InvitationResponse;
         toast({
           title: 'Success',
           description: `You successfully invited ${
-            response.data.email
+            res.email
           } to work with you as a ${
-            response.data.role
+            res.role
           }. They have to accept the invitation before ${
-            dayjs(response.data.expiration).format('YYYY. MM. DD')
+            dayjs(res.expiration).format('YYYY. MM. DD')
           }. After that you have to create a new invitation`,
           isClosable: true,
           status: 'success',
@@ -45,7 +47,7 @@ export const CreateInvite: React.FC<Props> = ({isOpen, onClose, refresh}) => {
   }
   const options = useObserver(() =>
     Object.entries(UserRoleEnum)
-      .filter(entry => appStore.role === UserResponseRoleEnum.Admin || entry[1] !== UserRoleEnum.Admin)
+      .filter(entry => appStore.role === SERVERROLE.Admin || entry[1] !== UserRoleEnum.Admin)
       .map(entry => (<option value={entry[1]} key={entry[1]}>{entry[0]}</option>))
     );
 
@@ -70,7 +72,7 @@ export const CreateInvite: React.FC<Props> = ({isOpen, onClose, refresh}) => {
             </Box>
             <Box>
               <FormLabel htmlFor="role">Select the Role of the new user</FormLabel>
-              <Select id="role" defaultValue={UserRoleEnum.User} value={role} onChange={(event) => setRole(event.target.value as UserRoleEnum)}>
+              <Select id="role" defaultValue={UserRoleEnum.User} value={role} onChange={(event) => setRole(event.target.value as SERVERROLE)}>
                 {options}
               </Select>
             </Box>

@@ -1,71 +1,97 @@
 import * as React from "react"
-import { Box, Button, Circle, CloseButton, Flex, Heading, Icon, Slide, Square, useColorModeValue } from '@chakra-ui/react'
+import { Box, Button, Circle, CloseButton, Flex, Heading, HStack, Icon, Slide, Square, useColorModeValue } from '@chakra-ui/react'
 import { useStores } from '../../stores';
 import { useObserver } from 'mobx-react';
-import { ArrowRightIcon, EmailIcon } from '@chakra-ui/icons';
+import { ArrowBackIcon, ArrowLeftIcon, ArrowRightIcon, EmailIcon } from '@chakra-ui/icons';
 import { MotionFlex } from '../Motion';
 import { motion } from 'framer-motion';
 import { UserResponseRoleEnum } from '../../axiosClient';
 import { DrawerItemProps } from './types';
-import { FaFileInvoice, FaUsers } from 'react-icons/fa';
+import { FaAtlas, FaBookReader, FaCodeBranch, FaFileInvoice, FaUsers, FaUserShield } from 'react-icons/fa';
 import { DrawerItem } from './DrawerItem';
+import { useHistory, useParams, useRouteMatch } from 'react-router-dom';
+import { SERVERROLE } from '../../client';
 
 const Control = motion(Square);
 export type NavGroup = {
   [key in UserResponseRoleEnum]: DrawerItemProps[]
 }
 
+export const NavItems: DrawerItemProps[] = [
+  {
+    path: '/projects',
+    display: 'Projects',
+    icon: <Icon as={FaFileInvoice} />
+  },
+  {
+    path: '/users',
+    display: 'Users',
+    icon: <Icon as={FaUsers} />
+    //FaRegUserCircle
+    //FaUserCircle
+    //FaUserFriends
+  },
+  {
+    path: '/invites',
+    display: 'Invitations',
+    icon: <EmailIcon />
+  },
+  {
+    path: '/roles',
+    display: 'Roles',
+    icon: <Icon as={FaUserShield} />
+  }
+];
+
+export const ProjectNavItems: (id: string) => DrawerItemProps[] = (id: string) => ([
+  {
+    path: `/projects/${id}`,
+    display: 'Details',
+    icon: <Icon as={FaFileInvoice} />
+  },
+  {
+    path: `/projects/${id}/access`,
+    display: 'Access',
+    icon: <Icon as={FaUserShield} />,
+    // <Icon as={FaUsers} />
+    //FaRegUserCircle
+    //FaUserCircle
+    //FaUserFriends
+  },
+  {
+    path: `/projects/${id}/languages`,
+    display: 'Languages',
+    icon: <Icon as={FaAtlas} />
+  },
+  {
+    path: `/projects/${id}/branches`,
+    display: 'Branches',
+    icon: <Icon as={FaCodeBranch} />
+  },
+  {
+    path: `/projects/${id}/identifiers`,
+    display: 'Identifiers',
+    icon: <Icon as={FaBookReader} />
+  },
+]);
+
+
 export const NavGroups: NavGroup = {
   USER: [
-    {
-      path: '/projects',
-      display: 'Projects',
-      icon: <Icon as={FaFileInvoice} />
-    },
-    {
-      path: '/projects',
-      display: 'Translations',
-      icon: <Icon as={FaFileInvoice} />
-    },
-    {
-      path: '/projects',
-      display: 'ServerRoles',
-      icon: <Icon as={FaFileInvoice} />
-    },
-    {
-      path: '/projects',
-      display: 'Projects',
-      icon: <Icon as={FaFileInvoice} />
-    }
+    NavItems[0],
+    NavItems[1],
+    NavItems[3],
   ],
   PO: [
-    {
-      path: '/projects',
-      display: 'Projects',
-      icon: <Icon as={FaFileInvoice} />
-    }
+    NavItems[0],
+    NavItems[1],
+    NavItems[3],
   ],
   HR: [
-    {
-      path: '/invites',
-      display: 'Invitations',
-      icon: <EmailIcon />
-    },
-    {
-      path: '/users',
-      display: 'Users',
-      icon: <Icon as={FaUsers} />
-      //FaRegUserCircle
-      //FaUserCircle
-      //FaUserFriends
-    }
+    ...NavItems,
   ],
   ADMIN: [
-    {
-      path: '/projects',
-      display: 'Projects',
-      icon: <Icon as={FaFileInvoice} />
-    }
+    ...NavItems,
   ]
 };
 
@@ -73,8 +99,13 @@ const ItemGenerator = (items: DrawerItemProps[]) => items.map(props => (<DrawerI
 
 export const DrawerNav = () => {
   const {appStore} = useStores();
+  const projectId = useRouteMatch<{projectId: string}>('/projects/:projectId')?.params.projectId;
+  const isProject = projectId !== undefined;
   const bg = useColorModeValue('gray.300', 'gray.500');
+  const backBg = useColorModeValue('gray.200', 'gray.400');
   const icon = useColorModeValue('gray.400', 'teal.700');
+  const history = useHistory();
+  const goBack = () => history.push('/projects')
   const container = {
     hidden: { marginLeft: '-20%'},
     show: {
@@ -113,9 +144,25 @@ export const DrawerNav = () => {
         variants={container}
         initial="hidden"
         >
-        <Heading p={5}>Menu</Heading>
+        <HStack justify="space-between" pr={4}>
+          <Heading p={5}>Menu</Heading>
+          {isProject && 
+            <Control
+              onClick={goBack}
+              bgColor={backBg}
+              p={3}
+              px={4}
+              as="button"
+              borderRadius="xl"
+              layout
+              whileHover={{scale: 1.1}}
+              >
+                <ArrowBackIcon />
+            </Control>
+          }
+        </HStack>
         <Flex direction="column">
-        {appStore.role && ItemGenerator(NavGroups[appStore.role])}
+        {isProject ? ItemGenerator(ProjectNavItems(projectId)) : ItemGenerator(NavGroups[appStore.role || SERVERROLE.User])}
         </Flex>
       </MotionFlex>
     </>

@@ -23,6 +23,7 @@ export const PasswordField: React.FC<InputProps> = ({value, setValue}) => {
           _placeholder={{color: placeholderColor}}
           value={value}
           onChange={event => setValue(event.target.value)}
+          className="passwordInput"
         />
         <InputRightElement width="3.0rem">
           <Button h="1.75rem" size="sm" onClick={handleClick} variant="unstyled">

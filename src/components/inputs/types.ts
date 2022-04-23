@@ -6,4 +6,5 @@ export interface NameProps {
   label: string;
   id: string;
   placeholder: string;
+  className?: string;
 }

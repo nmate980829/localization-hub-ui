@@ -13,10 +13,6 @@ const publicNav: Item[] = [
     path: '/login',
     display: 'Login'
   },
-  {
-    path: '/register',
-    display: 'Register'
-  }
 ];
 const privateNav: Item[] = [
   {

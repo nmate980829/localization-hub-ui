@@ -8,6 +8,7 @@ import { LoaderOverlay } from '../components/LoaderOverlay';
 import { useStores } from '../stores';
 import { PublicRoutes } from './publicPages';
 import {  PrivateRouter } from './privatePages';
+import { ProjectRouter } from './projectPages';
 
 export const MainRouter = () => {
   const {appStore} = useStores();
@@ -15,6 +16,7 @@ export const MainRouter = () => {
     <MainLayout>
       <Switch>
         {PrivateRouter}
+        {ProjectRouter}
         {PublicRoutes}
       </Switch>
     </ MainLayout>

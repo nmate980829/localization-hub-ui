@@ -8,8 +8,9 @@ import { NavItemProps as Props } from './types';
 export const NavItem: React.FC<Props> = ({path, display}) => {
   const activeBg = useColorModeValue('gray.300', 'teal.600');
   return (
-      <Link to={path}>
+      <Link to={path} className={display.toLowerCase()}>
         <ChakraLink
+          as="span"
           p={6}
           px={10}
           _hover={{

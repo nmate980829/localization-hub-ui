@@ -19,6 +19,7 @@ export const EmailField = React.forwardRef<HTMLInputElement, InputProps>(({value
           value={value}
           ref={ref}
           onChange={event => setValue(event.target.value)}
+          className="emailInput"
           />
       </InputGroup>
       <FormHelperText>Please enter your e-mail in a correct format.</FormHelperText>
