@@ -41,7 +41,7 @@ export const MainLayout: React.FC<LayoutProps> = ({children}) => {
         {appStore.isLoggedIn && (
           <DrawerNav />
         )}
-        <Flex h="100%" maxHeight="100%" flex={1}>
+        <Flex h="100%" maxHeight="100%" flex={1} w={appStore.drawerOpen ? {base: '0%', lg: '80%'} : undefined}>
           {children}
         </Flex>
       </Flex>

@@ -1,5 +1,5 @@
 import * as React from "react"
-import { Box, Button, Circle, CloseButton, Flex, Heading, HStack, Icon, Slide, Square, useColorModeValue } from '@chakra-ui/react'
+import { Box, Button, Circle, CloseButton, Flex, Heading, HStack, Icon, Slide, Square, useBreakpointValue, useColorModeValue } from '@chakra-ui/react'
 import { useStores } from '../../stores';
 import { useObserver } from 'mobx-react';
 import { ArrowBackIcon, ArrowLeftIcon, ArrowRightIcon, EmailIcon } from '@chakra-ui/icons';
@@ -106,8 +106,10 @@ export const DrawerNav = () => {
   const icon = useColorModeValue('gray.400', 'teal.700');
   const history = useHistory();
   const goBack = () => history.push('/projects')
+  const marginLeft = useBreakpointValue({base: '-100%', md: '-20%'})
+  const buttonPosOpen = useBreakpointValue({base: '90%', md: '21%'})
   const container = {
-    hidden: { marginLeft: '-20%'},
+    hidden: { marginLeft },
     show: {
       marginLeft: '0%',
       transition: {
@@ -130,12 +132,12 @@ export const DrawerNav = () => {
         p={5}
         as="button"
         borderRadius="xl"
-        animate={{rotate: appStore.drawerOpen ? 180 : 0, left: appStore.drawerOpen ? '21%': '1%'}}
+        animate={{rotate: appStore.drawerOpen ? 180 : 0, left: appStore.drawerOpen ? buttonPosOpen : '1%'}}
         >
         <ArrowRightIcon />
       </Control>
       <MotionFlex
-        w="20%"
+        w={{base: '100%', md: '20%'}}
         h="100%"
         direction="column"
         bgColor={bg}
