@@ -18,7 +18,7 @@ export const useApi = () => {
   const accessApi = new AccessApi(config, appStore.token?.server);
   const roleApi = new RolesApi(config, appStore.token?.server);
   const rightApi = new RightsApi(config, appStore.token?.server);
-  const authApi = new AuthenticationApi(new Configuration({}), 'http://localhost:3000');
+  const authApi = new AuthenticationApi(new Configuration({}), process.env.REACT_APP_API_URL);
 
   return {
     userApi,
