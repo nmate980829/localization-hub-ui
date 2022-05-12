@@ -107,7 +107,8 @@ export const DrawerNav = () => {
   const history = useHistory();
   const goBack = () => history.push('/projects')
   const marginLeft = useBreakpointValue({base: '-100%', md: '-20%'})
-  const buttonPosOpen = useBreakpointValue({base: '90%', md: '21%'})
+  const buttonPosOpen = useBreakpointValue({base: '80%', md: '21%'})
+  const buttonPosTop = useBreakpointValue({base: 24, sm: 20})
   const container = {
     hidden: { marginLeft },
     show: {
@@ -124,7 +125,7 @@ export const DrawerNav = () => {
     <>
       <Control
         position="fixed"
-        top={20}
+        top={buttonPosTop}
         left={5}
         zIndex={11}
         onClick={appStore.drawerOpen ? appStore.closeDrawer : appStore.openDrawer}
