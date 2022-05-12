@@ -145,7 +145,7 @@ export const SettingsView: React.FC<UserProps> = ({ }) => {
               <Button onClick={updatePassword}>Set password</Button>
             </Box>
 
-            {(role === SERVERROLE.Admin || role === SERVERROLE.Hr) &&
+            {(appStore.user?.role === SERVERROLE.Admin || appStore.user?.role === SERVERROLE.Hr) &&
                 <Box>
                   <Heading size="md">Change your role</Heading>
                   <Divider mb={4} mt={2} />
